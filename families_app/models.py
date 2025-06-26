@@ -70,9 +70,62 @@ class UserManager(models.Manager):
         if not user:
             errors['email'] = "البريد الإلكتروني غير صحيح"
         return errors
+    
+    def child_validator(self,postdata):
+        errors = {}
+        EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+        first_name = postdata.get('first_name','').strip()
+        last_name = postdata.get('last_name','').strip()
 
+        if len(first_name) < 2:
+            errors['first_name'] = "الاسم الأول يجب أن لا يقل عن حرفين"
+        elif not first_name.isalpha():
+            errors['first_name'] = "الاسم الأول يجب أن يحتوي على أحرف فقط"
+
+        if len(last_name) < 2:
+            errors['last_name'] = "الاسم الأخير يجب أن لا يقل عن حرفين"
+        elif not last_name.isalpha():
+            errors['last_name'] = "الاسم الأخير يجب أن يحتوي على أحرف فقط"
+
+        if not EMAIL_REGEX.match(postdata['email']):
+            errors['email'] = "بريد إلكتروني غير صالح"
+
+        if User.objects.filter(email=postdata['email']).exists():
+            errors['email'] = "هذا البريد الإلكتروني مسجل مسبقًا"
+
+        if len(postdata['password']) < 8:
+            errors['password'] = "كلمة المرور يجب أن لا تقل عن 8 أحرف"
+
+        if postdata['repeatPassword'] != postdata['password']:
+            errors['repeatPassword'] = "كلمتا المرور غير متطابقتين"
+
+        return errors
+
+class TaskManager(models.Manager):
+    def validate_task(self, postdata):
+        errors = {}
+        
+        title = postdata.get('title', '').strip()
+        description = postdata.get('description', '').strip()
+        due_date = postdata.get('due_date', '').strip()
+
+        if len(title) < 2:
+            errors['title'] = "عنوان المهمة يجب أن لا يقل عن حرفين"
+
+        if due_date:
+            try:
+                from datetime import date
+                due = date.fromisoformat(due_date)
+                if due < date.today():
+                    errors['due_date'] = "تاريخ الانتهاء لا يمكن أن يكون في الماضي"
+            except ValueError:
+                errors['due_date'] = "صيغة التاريخ غير صحيحة"
+
+        return errors
 
             
+
+        
 
 class FamilyManager(models.Manager):
     def validate_family(self,postdata):
@@ -81,6 +134,23 @@ class FamilyManager(models.Manager):
             errors['familyName'] = "اسم العائلة يجب أن لا يقل عن حرفين"
         return errors
 
+class RewardManger(models.Manager):
+    def validate_rewards(self,postdata):
+        errors = {}
+        name = postdata.get('name', '').strip()
+        points_str = postdata.get('points', '').strip()
+
+        if len(name) < 2:
+            errors['name'] = "اسم الجائزة يجب أن لا يقل عن حرفين"
+
+        if not points_str.isdigit():
+            errors['points'] = "النقاط يجب أن تكون رقمًا صحيحًا"
+        else:
+            points = int(points_str)
+            if points <= 0:
+                errors['points'] = "النقاط يجب أن تكون أكبر من صفر"
+
+        return errors
 # ====== MODELS ======
 
 class User(models.Model):
@@ -121,6 +191,7 @@ class Task(models.Model):
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    objects = TaskManager()
 
 
 class TaskSubmission(models.Model):
@@ -134,16 +205,17 @@ class TaskSubmission(models.Model):
 class Reward(models.Model):
     title = models.CharField(max_length=100)
     points_cost = models.PositiveIntegerField()
+    image = models.ImageField(upload_to='rewards/', null=True, blank=True)
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    objects = RewardManger()
 
 
 class PointsTransaction(models.Model):
     child = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'child'})
     points = models.IntegerField()  
-    reason = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
 
