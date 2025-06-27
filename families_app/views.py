@@ -5,6 +5,8 @@ import bcrypt
 from django.http import JsonResponse,HttpResponse
 import json
 from django.urls import reverse
+from django.db.models import Sum
+
 
 
 # Create your views here.
@@ -20,25 +22,27 @@ def login(request):
 
 def create_user(request):
     if request.method == 'POST':
-        errors = User.objects.user_validator(request.POST)
+        data = json.loads(request.body)  
+        errors = User.objects.user_validator(data)
         if errors:
             return JsonResponse({'success': False, 'errors': errors})
 
         hashed_pw = bcrypt.hashpw(
-            request.POST['registerPassword'].encode(),
+            data['registerPassword'].encode(),
             bcrypt.gensalt()
         ).decode()
 
         user = User.objects.create(
-            first_name=request.POST['registerFirstName'],
-            last_name=request.POST['registerLastName'],
-            email=request.POST['registerEmail'],
-            birth_day=request.POST['registerBirthDay'],
+            first_name=data['registerFirstName'],
+            last_name=data['registerLastName'],
+            email=data['registerEmail'],
+            birth_day=data['registerBirthDay'],
             password=hashed_pw,
             role='parent'
         )
 
         request.session['name'] = f"{user.first_name} {user.last_name}"
+        request.session['user_id'] = user.id
         return JsonResponse({'success': True, 'message': 'تم إنشاء الحساب بنجاح!'})
 
     return JsonResponse({'success': False, 'errors': {'general': 'طلب غير صالح'}})
@@ -54,6 +58,9 @@ def login_user(request):
         user = User.objects.filter(email=data['loginEmail']).first()
         request.session['name'] = f"{user.first_name} {user.last_name}"
         request.session['user_id'] = user.id
+
+        if user.role == 'child':
+            return JsonResponse({'success': True, 'redirect_url': '/child_dashboard'})
 
         return JsonResponse({'success': True, 'redirect_url': '/dashboard'})
 
@@ -189,10 +196,20 @@ def task_list(request, id):
 def review_tasks(request, id):
     if 'user_id' not in request.session:
         return redirect('index')
+
     user = User.objects.get(id=request.session['user_id'])
     if user.role != 'parent':
         return redirect('index')
-    return render(request, 'tasks/review_tasks.html')
+
+    family = Family.objects.get(id=id)
+    submissions = TaskSubmission.objects.filter(task__family=family).order_by('-submitted_at')
+
+    context = {
+        'family': family,
+        'submissions': submissions,
+    }
+    return render(request, 'tasks/review_tasks.html', context)
+
 
 def children(request, id):
     if 'user_id' not in request.session:
@@ -206,17 +223,26 @@ def children(request, id):
 def rewards(request, id):
     if 'user_id' not in request.session:
         return redirect('index')
+
     user = User.objects.get(id=request.session['user_id'])
     if user.role != 'parent':
         return redirect('index')
+
     family = Family.objects.get(id=id)
+
     rewards = Reward.objects.filter(family=family)
+
+    redemptions = ClaimedReward.objects.filter(
+        reward__family=family
+    ).select_related('child', 'reward').order_by('-claimed_at')
 
     context = {
         'family': family,
         'rewards': rewards,
+        'redemptions': redemptions,    
     }
     return render(request, 'rewards/rewards.html', context)
+
 
 def add_task(request, id):
     if 'user_id' not in request.session:
@@ -236,6 +262,7 @@ def add_task(request, id):
             title=data['title'],
             description=data.get('description', ''),
             due_date=data.get('due_date') or None,
+            points = data.get('points'),
             family=family,
             created_by=User.objects.get(id=request.session['user_id'])
         )
@@ -385,3 +412,143 @@ def delete_reward(request, id):
             return redirect('dashboard')
 
     return redirect('dashboard')
+
+
+def child_dashboard(request):
+    if 'user_id' not in request.session:
+        return redirect('index')
+    user = User.objects.get(id=request.session['user_id'])
+    if user.role != 'child':
+        return redirect('index')
+    family_member = FamilyMember.objects.filter(user=user).first()
+    family = family_member.family
+    tasks = Task.objects.filter(family=family)
+    rewards = Reward.objects.filter(family=family)
+    total_points = PointsTransaction.objects.filter(child=user).aggregate(total=models.Sum('points'))['total'] or 0
+    claimed_ids = ClaimedReward.objects.filter(child=user).values_list('reward_id', flat=True)
+
+
+    context = {
+        'user': user,
+        'family' : family,
+        'tasks' : tasks,
+        'rewards' : rewards,
+        'points': {'points': total_points},
+        'claimed_reward_ids': claimed_ids
+
+    }
+    return render(request,'child_dashboard.html',context)
+ 
+
+def submit_task(request, id):
+    if 'user_id' not in request.session:
+        return redirect('index')
+
+    user = User.objects.get(id=request.session['user_id'])
+    if user.role != 'child':
+        return redirect('index')
+
+    task = Task.objects.get(id=id)
+    my_submission = TaskSubmission.objects.filter(task=task, child=user).first()
+    context = {
+        'task': task,
+        'my_submission': my_submission
+    }
+
+    return render(request, 'tasks/submit_proof.html',context )
+
+def claim_reward(request, id):
+    if 'user_id' not in request.session:
+        return redirect('index')
+
+    user = User.objects.get(id=request.session['user_id'])
+    if user.role != 'child':
+        return redirect('index')
+
+    reward = Reward.objects.get( id=id)
+    family = Family.objects.get(id=reward.family.id)
+
+    total_points = PointsTransaction.objects.filter(child=user).aggregate(Sum('points'))['points__sum'] or 0
+
+    if total_points < reward.points_cost:
+        messages.error(request, "❌ ليس لديك نقاط كافية لاستبدال هذه المكافأة.")
+        return redirect('child_dashboard')  
+
+    PointsTransaction.objects.create(
+        child=user,
+        points=-reward.points_cost,
+    )
+
+    ClaimedReward.objects.create(
+        child=user,
+        reward=reward,
+        family=family
+    )
+
+    messages.success(request, f"🎁 تم استبدال المكافأة: {reward.title} بنجاح!")
+    return redirect('child_dashboard')
+
+
+
+def submit_proof(request, task_id):
+    if 'user_id' not in request.session:
+        return redirect('index')
+
+    if request.method == 'POST':
+        task = Task.objects.get(id=task_id)
+        child = User.objects.get(id=request.session['user_id'])
+        proof_image = request.FILES.get('proof')
+
+        TaskSubmission.objects.filter(task=task, child=child, is_approved=False).delete()
+
+        TaskSubmission.objects.create(
+            task=task,
+            child=child,
+            proof=proof_image,
+            is_approved = None
+
+        )
+
+        messages.warning(request, '📤 تم إرسال مهمة! بانتظار الموافقة.')
+        return redirect('submit_task', id=task_id)
+
+    return redirect('child_dashboard')
+
+def approve_submission(request, id):
+    if 'user_id' not in request.session:
+        return redirect('index')
+
+    user = User.objects.get(id=request.session['user_id'])
+    if user.role != 'parent':
+        return redirect('index')
+
+    submission = TaskSubmission.objects.get(id=id)
+    submission.is_approved = True
+    submission.save()
+
+    task_points = submission.task.points or 0
+
+    if task_points > 0:
+        PointsTransaction.objects.create(
+            child=submission.child,
+            points=task_points
+        )
+
+    return redirect('review_tasks', id=submission.task.family.id)
+
+def reject_submission(request, id):
+    if 'user_id' not in request.session:
+        return redirect('index')
+
+    user = User.objects.get(id=request.session['user_id'])
+    if user.role != 'parent':
+        return redirect('index')
+
+    submission = TaskSubmission.objects.get(id=id)
+    submission.is_approved = False
+    submission.save()
+    return redirect('review_tasks', id=submission.task.family.id)
+
+
+def about(request):
+    return render(request, 'about.html')

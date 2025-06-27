@@ -24,7 +24,7 @@
 
     <main class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold">📋 قائمة المهام  {{ family.name }}</h3>
+            <h3 class="fw-bold">📋 قائمة المهام {{ family.name }}</h3>
             <a href="{% url 'add_task' family.id %}" class="btn btn-orange">➕ إضافة مهمة</a>
         </div>
 
@@ -38,6 +38,7 @@
                         <h5 class="card-title">{{ task.title }}</h5>
                         <p class="card-text text-muted">{{ task.description }}</p>
                         <p class="text-end"><strong>تاريخ التسليم:</strong> {{ task.due_date }}</p>
+                        <p class="mb-2"> النقاط: <strong>{{ task.points }}</strong></p>
                         <form action="{% url 'delete_task' task.id %}" method="post"
                             onsubmit="return confirm('هل تريد حذف هذه المهمة؟');">
                             {% csrf_token %}
@@ -58,6 +59,10 @@
             <a href="{% url 'manage_family' family.id %}" class="btn btn-outline-orange"> العودة لإدارة العائلة</a>
         </div>
     </main>
+    <footer class="text-center text-muted py-3 mt-5">
+  <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+</footer>
+
 
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>

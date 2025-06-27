@@ -54,6 +54,11 @@
     <a href="{% url 'children' family.id %}" class="btn btn-outline-orange">رجوع</a>
   </form>
 
+  <footer class="text-center text-muted py-3 mt-5">
+  <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+</footer>
+
+
   <script>
     document.getElementById('childForm').addEventListener('submit', async function(e) {
       e.preventDefault();

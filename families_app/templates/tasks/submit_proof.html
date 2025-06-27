@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مهامي</title>
+  <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'CSS/style.css' %}" rel="stylesheet" />
+</head>
+
+<body>
+
+  <header>
+    <nav class="navbar navbar-light bg-white shadow-sm">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <img src="{% static 'images/logo.png' %}" width="40" height="40" />
+          <span class="fw-bold brand-orange fs-5">بُناة المستقبل</span>
+        </div>
+        <a href="{% url 'logout' %}" class="btn btn-orange">تسجيل الخروج</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <div class="card p-4 shadow-sm">
+      <h3 class="fw-bold">{{ task.title }}</h3>
+      <p>{{ task.description }}</p>
+
+      {% if my_submission %}
+      {% if my_submission.is_approved %}
+      <p class="text-success mt-3">✅ تمت الموافقة على هذه المهمة 🎉</p>
+      <img src="{{ my_submission.proof.url }}" class="img-fluid rounded mt-2" width="300">
+      {% elif my_submission.is_approved == False %}
+      <p class="text-danger mt-3">❌ تم رفض المهمة</p>
+      <img src="{{ my_submission.proof.url }}" class="img-fluid rounded mt-2" width="300">
+      <form action="{% url 'submit_proof' task.id %}" method="POST" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-2">
+          <label class="form-label">📤 إعادة إرسال الإثبات:</label>
+          <input type="file" name="proof" accept="image/*" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-warning w-100">إرسال من جديد</button>
+      </form>
+      {% else %}
+      <p class="text-warning mt-3">⏳ تم الإرسال - بانتظار الموافقة</p>
+      <img src="{{ my_submission.proof.url }}" class="img-fluid rounded mt-2" width="300">
+      {% endif %}
+      {% else %}
+      <form action="{% url 'submit_proof' task.id %}" method="POST" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-2">
+          <label class="form-label">📤 إرفاق صورة إثبات:</label>
+          <input type="file" name="proof" accept="image/*" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-orange w-100">إرسال المهمة</button>
+      </form>
+      {% endif %}
+
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'child_dashboard' %}" class="btn btn-outline-orange"> العودة </a>
+    </div>
+  </main>
+
+  <footer class="text-center text-muted py-3 mt-5">
+    <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+  </footer>
+
+
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+
+</html>

@@ -25,10 +25,13 @@ urlpatterns = [
     path('family/<int:id>/rewards/create/', views.create_reward, name='create_reward'),
     path('family/<int:id>/rewards/add/', views.add_reward, name='add_reward'),
     path('family/rewards/delete/<int:id>/', views.delete_reward, name='delete_reward'),
-
-
-
-
+    path('child_dashboard',views.child_dashboard,name='child_dashboard'),
+    path('task/<int:id>/submit/', views.submit_task, name='submit_task'),
+    path('reward/<int:id>/claim/', views.claim_reward, name='claim_reward'),
+    path('tasks/<int:task_id>/submit_proof/', views.submit_proof, name='submit_proof'),
+    path('tasks/approve/<int:id>/', views.approve_submission, name='approve_submission'),
+    path('tasks/reject/<int:id>/', views.reject_submission, name='reject_submission'),
+    path('about/', views.about, name='about'),
 
     
 ]

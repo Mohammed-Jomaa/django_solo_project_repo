@@ -9,29 +9,34 @@ class UserManager(models.Manager):
         errors = {}
         EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 
-        if len(postdata['registerFirstName']) < 2:
+        first_name = postdata.get('registerFirstName', '').strip()
+        last_name = postdata.get('registerLastName', '').strip()
+        email = postdata.get('registerEmail', '').strip()
+        password = postdata.get('registerPassword', '')
+        repeat_password = postdata.get('registerRepeatPassword', '')
+        birth_day = postdata.get('registerBirthDay', '')
+
+        if len(first_name) < 2:
             errors['registerFirstName'] = "الاسم الأول يجب أن لا يقل عن حرفين"
-        elif not postdata['registerFirstName'].isalpha():
+        elif not first_name.isalpha():
             errors['registerFirstName'] = "الاسم الأول يجب أن يحتوي على أحرف فقط"
 
-        if len(postdata['registerLastName']) < 2:
+        if len(last_name) < 2:
             errors['registerLastName'] = "الاسم الأخير يجب أن لا يقل عن حرفين"
-        elif not postdata['registerLastName'].isalpha():
+        elif not last_name.isalpha():
             errors['registerLastName'] = "الاسم الأخير يجب أن يحتوي على أحرف فقط"
 
-        if not EMAIL_REGEX.match(postdata['registerEmail']):
+        if not EMAIL_REGEX.match(email):
             errors['registerEmail'] = "بريد إلكتروني غير صالح"
-
-        if User.objects.filter(email=postdata['registerEmail']).exists():
+        elif User.objects.filter(email=email).exists():
             errors['registerEmail'] = "هذا البريد الإلكتروني مسجل مسبقًا"
 
-        if len(postdata['registerPassword']) < 8:
+        if len(password) < 8:
             errors['registerPassword'] = "كلمة المرور يجب أن لا تقل عن 8 أحرف"
 
-        if postdata['registerRepeatPassword'] != postdata['registerPassword']:
+        if repeat_password != password:
             errors['registerRepeatPassword'] = "كلمتا المرور غير متطابقتين"
 
-        birth_day = postdata.get('registerBirthDay')
         if birth_day:
             try:
                 birth_date = date.fromisoformat(birth_day)
@@ -108,6 +113,7 @@ class TaskManager(models.Manager):
         title = postdata.get('title', '').strip()
         description = postdata.get('description', '').strip()
         due_date = postdata.get('due_date', '').strip()
+        points_str = postdata.get('points', '').strip()
 
         if len(title) < 2:
             errors['title'] = "عنوان المهمة يجب أن لا يقل عن حرفين"
@@ -120,6 +126,13 @@ class TaskManager(models.Manager):
                     errors['due_date'] = "تاريخ الانتهاء لا يمكن أن يكون في الماضي"
             except ValueError:
                 errors['due_date'] = "صيغة التاريخ غير صحيحة"
+        
+        if not points_str.isdigit():
+            errors['points'] = "النقاط يجب أن تكون رقمًا صحيحًا"
+        else:
+            points = int(points_str)
+            if points <= 0:
+                errors['points'] = "النقاط يجب أن تكون أكبر من صفر"
 
         return errors
 
@@ -188,6 +201,7 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
+    points = models.IntegerField(default=10)
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -199,7 +213,7 @@ class TaskSubmission(models.Model):
     child = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'child'})
     proof = models.ImageField(upload_to='task_proofs/')
     submitted_at = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(null=True, default=None)
 
 
 class Reward(models.Model):
@@ -220,16 +234,9 @@ class PointsTransaction(models.Model):
 
 
 class ClaimedReward(models.Model):
-    STATUS_CHOICES = (
-        ('pending', 'قيد المراجعة'),
-        ('approved', 'تمت الموافقة'),
-        ('rejected', 'مرفوض'),
-    )
-
     child = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'child'})
     reward = models.ForeignKey(Reward, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True, blank=True)
     claimed_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.child.first_name} طلب {self.reward.title} - {self.status}"
+
