@@ -39,11 +39,14 @@
                         <p class="card-text text-muted">{{ task.description }}</p>
                         <p class="text-end"><strong>تاريخ التسليم:</strong> {{ task.due_date }}</p>
                         <p class="mb-2"> النقاط: <strong>{{ task.points }}</strong></p>
-                        <form action="{% url 'delete_task' task.id %}" method="post"
-                            onsubmit="return confirm('هل تريد حذف هذه المهمة؟');">
+                        <form id="delete-task-form-{{ task.id }}" action="{% url 'delete_task' task.id %}" method="post"
+                            style="display: none;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-danger mb-2">🗑️ حذف المهمة</button>
                         </form>
+
+                        <button type="button" class="btn btn-danger mb-2" onclick="confirmDeleteTask({{ task.id }})">🗑️
+                            حذف المهمة</button>
+
 
 
                     </div>
@@ -60,11 +63,34 @@
         </div>
     </main>
     <footer class="text-center text-muted py-3 mt-5">
-  <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
-</footer>
+        <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+    </footer>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+  function confirmDeleteTask(taskId) {
+    Swal.fire({
+      title: '🗑️ هل أنت متأكد؟',
+      text: "سيتم حذف المهمة نهائيًا!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذفها',
+      cancelButtonText: 'إلغاء',
+      reverseButtons: true,
+      customClass: {
+        confirmButton: 'btn btn-danger mx-2',
+        cancelButton: 'btn btn-outline-secondary'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById(`delete-task-form-${taskId}`).submit();
+      }
+    });
+  }
+</script>
+
 </body>
 
 </html>

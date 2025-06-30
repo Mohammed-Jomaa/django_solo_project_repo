@@ -50,18 +50,21 @@
         <div class="card shadow-sm h-100 text-center p-3">
           <div class="reward-image-container mb-3">
             {% if reward.image %}
-              <img src="{{ reward.image.url }}" alt="صورة الجائزة" class="reward-image">
+            <img src="{{ reward.image.url }}" alt="صورة الجائزة" class="reward-image">
             {% else %}
-              <img src="{% static 'images/gift.png' %}" alt="صورة افتراضية" class="reward-image">
+            <img src="{% static 'images/gift.png' %}" alt="صورة افتراضية" class="reward-image">
             {% endif %}
           </div>
           <h5 class="fw-bold">{{ reward.title }}</h5>
           <p class="mb-2">تكلفة النقاط: <strong>{{ reward.points_cost }}</strong></p>
-          <form action="{% url 'delete_reward' reward.id %}" method="post"
-                        onsubmit="return confirm('هل تريد حذف هذه الجائزة');">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger mb-2">🗑️ حذف الجائزة</button>
-                    </form>
+          <form id="delete-reward-form-{{ reward.id }}" action="{% url 'delete_reward' reward.id %}" method="post"
+            style="display: none;">
+            {% csrf_token %}
+          </form>
+
+          <button type="button" class="btn btn-danger mb-2" onclick="confirmDeleteReward({{ reward.id }})">🗑️ حذف
+            الجائزة</button>
+
 
         </div>
       </div>
@@ -70,35 +73,35 @@
     {% else %}
     <p class="text-muted text-center">لا توجد جوائز مضافة بعد.</p>
     {% endif %}
-    
+
     <section>
       <hr class="my-5">
-<h5 class="fw-bold mb-3">📦 الجوائز التي تم استبدالها:</h5>
+      <h5 class="fw-bold mb-3">📦 الجوائز التي تم استبدالها:</h5>
 
-{% if redemptions %}
-<table class="table table-bordered text-center">
-    <thead class="table-light">
-        <tr>
+      {% if redemptions %}
+      <table class="table table-bordered text-center">
+        <thead class="table-light">
+          <tr>
             <th>اسم الطفل</th>
             <th>اسم الجائزة</th>
             <th>عدد النقاط</th>
             <th>تاريخ الاستبدال</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in redemptions %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in redemptions %}
+          <tr>
             <td>{{ item.child.first_name }} {{ item.child.last_name }}</td>
             <td>{{ item.reward.title }}</td>
             <td>{{ item.reward.points_cost }}</td>
             <td>{{ item.claimed_at|date:"Y-m-d H:i" }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p class="text-muted">لا توجد عمليات استبدال بعد.</p>
-{% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-muted">لا توجد عمليات استبدال بعد.</p>
+      {% endif %}
 
     </section>
 
@@ -107,11 +110,34 @@
     </div>
   </main>
   <footer class="text-center text-muted py-3 mt-5">
-  <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
-</footer>
+    <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+  </footer>
 
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    function confirmDeleteReward(rewardId) {
+      Swal.fire({
+        title: '🎁 هل أنت متأكد؟',
+        text: "سيتم حذف هذه الجائزة نهائيًا!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، احذفها',
+        cancelButtonText: 'إلغاء',
+        reverseButtons: true,
+        customClass: {
+          confirmButton: 'btn btn-danger mx-2',
+          cancelButton: 'btn btn-outline-secondary'
+        },
+        buttonsStyling: false
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById(`delete-reward-form-${rewardId}`).submit();
+        }
+      });
+    }
+  </script>
+
 </body>
 
 </html>

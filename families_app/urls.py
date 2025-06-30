@@ -32,6 +32,7 @@ urlpatterns = [
     path('tasks/approve/<int:id>/', views.approve_submission, name='approve_submission'),
     path('tasks/reject/<int:id>/', views.reject_submission, name='reject_submission'),
     path('about/', views.about, name='about'),
+    path('api/motivation/', views.motivation_api, name='motivation_api'),
 
     
 ]

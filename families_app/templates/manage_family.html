@@ -24,28 +24,28 @@
           <span class="fw-bold brand-orange fs-5">بُناة المستقبل</span>
         </div>
         <a href="{% url 'logout' %}" class="btn btn-orange">تسجيل الخروج</a>
-        
+
       </div>
     </nav>
   </header>
 
-<main class="container  py-4">
-<h2 class="fw-bold text-center mb-4">👋 مرحبًا بك في  {{ family.name }}</h2>
+  <main class="container  py-4">
+    <h2 class="fw-bold text-center mb-4">👋 مرحبًا بك في {{ family.name }}</h2>
 
 
 
-  {% if request.session.user_id == family.owner.id %}
-  <div class="mb-4">
+    {% if request.session.user_id == family.owner.id %}
+    <div class="mb-4">
 
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
-      <form action="{% url 'add_admin' %}" method="post" class="d-flex align-items-center gap-2">
-  {% csrf_token %}
-  <input type="hidden" name="family_id" value="{{ family.id }}">
-  <input type="email" name="email" class="form-control" placeholder="أدخل بريد المشرف"
-    required>
-  <button type="submit" class=" btn btn-outline-orange add-btn" style="white-space: nowrap;"> إضافة مشرف</button>
-</form>
+        <form action="{% url 'add_admin' %}" method="post" class="d-flex align-items-center gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="family_id" value="{{ family.id }}">
+          <input type="email" name="email" class="form-control" placeholder="أدخل بريد المشرف" required>
+          <button type="submit" class=" btn btn-outline-orange add-btn" style="white-space: nowrap;"> إضافة
+            مشرف</button>
+        </form>
 
 
         <form id="deleteFamilyForm" method="post">
@@ -54,75 +54,93 @@
           <button type="submit" class="btn btn-danger mb-2">🗑️ حذف العائلة</button>
         </form>
 
-    </div>
-
-    <div id="deleteMessage" class="mt-3"></div>
-
-{% for message in messages %}
-  {% if 'error' in message.tags %}
-    <div class="alert alert-danger text-center">
-  {% else %}
-    <div class="alert alert-{{ message.tags }} text-center">
-  {% endif %}
-      {{ message }}
-    </div>
-{% endfor %}
-
-
-  </div>
-
-  
-  {% endif %}
-
-    <div class="row g-4 justify-content-center text-center mb-4">
-      <div class="col-md-3">
-        <a href="{% url 'task_list' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
-          <img src="{% static 'images/tasks.png' %}" class="card-img-top" alt="قائمة المهام">
-          <div class="card-body">
-            <h5 class="card-title">قائمة المهام</h5>
-          </div>
-        </a>
       </div>
 
-      <div class="col-md-3">
-        <a href="{% url 'review_tasks' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
-          <img src="{% static 'images/tttt.png' %}" class="card-img-top" alt="مهام قيد المراجعة">
-          <div class="card-body">
-            <h5 class="card-title">مهام قيد المراجعة</h5>
-          </div>
-        </a>
+      <div id="deleteMessage" class="mt-3"></div>
+
+      {% for message in messages %}
+      {% if 'error' in message.tags %}
+      <div class="alert alert-danger text-center">
+        {% else %}
+        <div class="alert alert-{{ message.tags }} text-center">
+          {% endif %}
+          {{ message }}
+        </div>
+        {% endfor %}
+
+
       </div>
 
-      <div class="col-md-3">
-        <a href="{% url 'children' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
-          <img src="{% static 'images/family.png' %}" class="card-img-top" alt="الأطفال">
-          <div class="card-body">
-            <h5 class="card-title">الأطفال</h5>
-          </div>
-        </a>
-      </div>
 
-      <div class="col-md-3">
-        <a href="{% url 'rewards' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
-          <img src="{% static 'images/climped.png' %}" class="card-img-top" alt="الجوائز والنقاط">
-          <div class="card-body">
-            <h5 class="card-title">الجوائز والنقاط</h5>
-          </div>
-        </a>
+      {% endif %}
+
+      <div class="row g-4 justify-content-center text-center mb-4">
+        <div class="col-md-3">
+          <a href="{% url 'task_list' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
+            <img src="{% static 'images/tasks.png' %}" class="card-img-top" alt="قائمة المهام">
+            <div class="card-body">
+              <h5 class="card-title">قائمة المهام</h5>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'review_tasks' family.id %}"
+            class="card shadow-sm h-100 text-decoration-none text-dark d-block">
+            <img src="{% static 'images/tttt.png' %}" class="card-img-top" alt="مهام قيد المراجعة">
+            <div class="card-body">
+              <h5 class="card-title">مهام قيد المراجعة</h5>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'children' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
+            <img src="{% static 'images/family.png' %}" class="card-img-top" alt="الأطفال">
+            <div class="card-body">
+              <h5 class="card-title">الأطفال</h5>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-3">
+          <a href="{% url 'rewards' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
+            <img src="{% static 'images/climped.png' %}" class="card-img-top" alt="الجوائز والنقاط">
+            <div class="card-body">
+              <h5 class="card-title">الجوائز والنقاط</h5>
+            </div>
+          </a>
+        </div>
       </div>
-    </div>
-    <div class="d-flex justify-content-end mb-4">
-  <a href="{% url 'dashboard' %}" class="btn btn-orange">عودة إلى لوحة التحكم</a>
-</div>
+      <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'dashboard' %}" class="btn btn-orange">عودة إلى لوحة التحكم</a>
+      </div>
   </main>
-<footer class="text-center text-muted py-3 mt-5">
-  <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
-</footer>
+  <footer class="text-center text-muted py-3 mt-5">
+    <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
+  </footer>
 
   <script>
     document.getElementById('deleteFamilyForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      if (!confirm("هل أنت متأكد أنك تريد حذف العائلة؟")) return;
+
+      const confirmation = await Swal.fire({
+        title: '🗑️ هل أنت متأكد؟',
+        text: "سيتم حذف العائلة نهائيًا، ولا يمكن التراجع!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، احذفها',
+        cancelButtonText: 'إلغاء',
+        reverseButtons: true,
+        customClass: {
+          confirmButton: 'btn btn-danger mx-2',
+          cancelButton: 'btn btn-outline-secondary'
+        },
+        buttonsStyling: false
+      });
+
+
+      if (!confirmation.isConfirmed) return;
 
       const form = e.target;
       const data = new FormData(form);
@@ -136,14 +154,24 @@
 
       const result = await response.json();
       if (result.success) {
-        window.location.href = result.redirect_url;
+        Swal.fire({
+          icon: 'success',
+          title: 'تم الحذف',
+          showConfirmButton: false,
+          timer: 1000
+        }).then(() => {
+          window.location.href = result.redirect_url;
+        });
       } else {
-        document.getElementById("deleteMessage").innerHTML =
-          `<div class="alert alert-danger">${result.error}</div>`;
+        Swal.fire({
+          icon: 'error',
+          text: result.error || 'حدث خطأ أثناء الحذف'
+        });
       }
     });
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 

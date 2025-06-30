@@ -31,6 +31,10 @@
                 <span class="fw-bold text-success">{{ points.points }}</span>
             </h5>
         </div>
+        <div class="alert alert-info text-center " id="motivation-box">
+            جاري تحميل جملة تحفيزية...
+        </div>
+
         {% for message in messages %}
         {% if 'error' in message.tags %}
         <div class="alert alert-danger text-center">
@@ -86,10 +90,15 @@
                         {% if reward.id in claimed_reward_ids %}
                         <button class="btn btn-sm btn-success" disabled>حصلت على الجائزة بالفعل</button>
                         {% else %}
-                        <form method="POST" action="{% url 'claim_reward' reward.id %}">
+                        <form id="claim-form-{{ reward.id }}" method="POST" action="{% url 'claim_reward' reward.id %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-orange">استبدال</button>
                         </form>
+
+                        <button type="button" class="btn btn-sm btn-outline-orange"
+                            onclick="confirmClaim({{ reward.id }}, '{{ reward.title }}')">
+                            استبدال
+                        </button>
+
                         {% endif %}
 
                     </div>
@@ -109,6 +118,40 @@
 
 
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch("{% url 'motivation_api' %}")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("motivation-box").innerText = data.quote;
+                })
+                .catch(() => {
+                    document.getElementById("motivation-box").innerText = "ابقَ متحفزًا دائمًا!";
+                });
+        });
+        function confirmClaim(rewardId, rewardTitle) {
+            Swal.fire({
+                title: 'هل تريد استبدال الجائزة؟',
+                text: `🎁 ${rewardTitle}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، استبدل',
+                cancelButtonText: 'إلغاء',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-success mx-2',
+                    cancelButton: 'btn btn-outline-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`claim-form-${rewardId}`).submit();
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>
