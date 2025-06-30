@@ -1,7 +1,3 @@
-
-markdown
-Copy
-Edit
 # 🏠 MissionFamily – بناة المستقبل
 
 MissionFamily is an interactive and educational platform designed to help children learn responsibility at home through task assignment, point collection, and rewards — all built with Django.
@@ -60,13 +56,16 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
-🛠️ Database Configuration
-This project uses MySQL as the database engine.
-Make sure to update your settings.py as follows:
+```
 
-python
-Copy
-Edit
+---
+
+## 🛠️ Database Configuration
+
+This project uses **MySQL** as the database engine.  
+Make sure to update your `settings.py` as follows:
+
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -77,6 +76,10 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+```
+
+---
+
 ## 🖼️ Screenshots
 
 | Page              | Screenshot |
@@ -90,18 +93,13 @@ DATABASES = {
 | Welcome Page      | ![Welcome Page](media/screenshot/image-8.png) |
 | Login Page        | ![Login Page](media/screenshot/image-9.png) |
 
+---
 
-🧰 Technologies Used
-Django 🌐
+## 🧰 Technologies Used
 
-Python 🐍
-
-MySQL 🐬
-
-Bootstrap 🎨
-
-AJAX ⚡
-
-Git + GitHub 🧰
-
-
+- Django 🌐  
+- Python 🐍  
+- MySQL 🐬  
+- Bootstrap 🎨  
+- AJAX ⚡  
+- Git + GitHub 🧰
