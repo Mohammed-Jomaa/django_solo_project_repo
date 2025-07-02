@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <title>الجوائز و النقاط</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'CSS/style.css' %}" rel="stylesheet">
   <style>
@@ -20,6 +21,17 @@
       height: 100%;
       object-fit: cover;
       border-radius: 10px;
+    }
+
+    .card {
+      width: 100%;
+    }
+
+    @media (max-width: 576px) {
+      .card {
+        width: 100% !important;
+        margin-bottom: 1rem;
+      }
     }
   </style>
 </head>
@@ -37,17 +49,17 @@
     </nav>
   </header>
 
-  <main class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-bold">🎁 قائمة الجوائز {{ family.name }}</h3>
+<main class="container-fluid px-2 py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h3 class="fw-bold mb-0">🎁 قائمة الجوائز {{ family.name }}</h3>
       <a href="{% url 'create_reward' family.id %}" class="btn btn-orange">➕ إضافة جائزة</a>
     </div>
 
     {% if rewards %}
     <div class="row g-4">
       {% for reward in rewards %}
-      <div class="col-md-4">
-        <div class="card shadow-sm h-100 text-center p-3">
+      <div class="col-12 col-sm-6 col-md-4 d-flex">
+        <div class="card shadow-sm text-center p-3 d-flex flex-column">
           <div class="reward-image-container mb-3">
             {% if reward.image %}
             <img src="{{ reward.image.url }}" alt="صورة الجائزة" class="reward-image">
@@ -57,15 +69,12 @@
           </div>
           <h5 class="fw-bold">{{ reward.title }}</h5>
           <p class="mb-2">تكلفة النقاط: <strong>{{ reward.points_cost }}</strong></p>
-          <form id="delete-reward-form-{{ reward.id }}" action="{% url 'delete_reward' reward.id %}" method="post"
-            style="display: none;">
+          <form id="delete-reward-form-{{ reward.id }}" action="{% url 'delete_reward' reward.id %}" method="post" style="display: none;">
             {% csrf_token %}
           </form>
-
-          <button type="button" class="btn btn-danger mb-2" onclick="confirmDeleteReward({{ reward.id }})">🗑️ حذف
-            الجائزة</button>
-
-
+          <button type="button" class="btn btn-danger mb-2" onclick="confirmDeleteReward({{ reward.id }})">
+            🗑️ حذف الجائزة
+          </button>
         </div>
       </div>
       {% endfor %}
@@ -102,13 +111,13 @@
       {% else %}
       <p class="text-muted">لا توجد عمليات استبدال بعد.</p>
       {% endif %}
-
     </section>
 
     <div class="text-center mt-4">
       <a href="{% url 'manage_family' family.id %}" class="btn btn-outline-orange">العودة لإدارة العائلة</a>
     </div>
   </main>
+
   <footer class="text-center text-muted py-3 mt-5">
     <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
   </footer>
@@ -137,7 +146,6 @@
       });
     }
   </script>
-
 </body>
 
 </html>

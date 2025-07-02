@@ -6,6 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>عائلاتي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
     <link href="{% static 'CSS/style.css' %}" rel="stylesheet" />
 
@@ -34,9 +35,9 @@
 
         <div class="row justify-content-center g-4">
             {% for family in families %}
-            <div class="col-md-4 d-flex justify-content-center">
+              <div class="col-6 col-sm-6 col-md-4 d-flex justify-content-center">
                 <div class="card shadow-sm h-100" style="max-width: 250px;">
-                    <img src="{% static 'images/family.png' %}" class="card-img-top" alt="صورة العائلة">
+                  <img src="{% static 'images/family.png' %}" class="card-img-top img-fluid" alt="صورة العائلة">
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ family.family.name }}</h5>
                         <a href="{% url 'manage_family' family.family.id %}" class="btn btn-outline-orange mt-2">إدارة

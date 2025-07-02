@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>مراجعة المهام</title>
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
     <link href="{% static 'CSS/style.css' %}" rel="stylesheet" />
@@ -11,29 +12,28 @@
 </head>
 
 <body>
-    <main class="container py-5">
-        <h3 class="fw-bold mb-4">
+    <main class="container-fluid px-2 py-4">
+        <h3 class="fw-bold mb-4 text-center">
             📋 المهام المرسلة للموافقة - {{ family.name }}
         </h3>
 
         {% if submissions %}
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             {% for sub in submissions %}
-            <div class="col-md-4 d-flex align-items-stretch">
-                <div class="card shadow-sm w-100 text-center p-3">
+            <div class="col-12 col-sm-12 col-md-4 d-flex">
+                <div class="card shadow-sm w-100 text-center p-3 d-flex flex-column">
                     <h5 class="fw-bold">{{ sub.task.title }}</h5>
                     <p>مرسلة من: {{ sub.child.first_name }} {{ sub.child.last_name }}</p>
                     <p>النقاط: {{ sub.task.points }}</p>
 
                     <div class="reward-image-container mb-3">
-                        <img src="{{ sub.proof.url }}" class="img-fluid rounded reward-image mb-2" alt="صورة الإثبات"
-                            style="max-height: 200px; object-fit: contain;" />
+                        <img src="{{ sub.proof.url }}" class="card-img-proof mb-2" alt="صورة الإثبات" />
                     </div>
 
                     {% if sub.is_approved %}
-                    <div class="alert alert-success mt-auto">تمت الموافقة ✅</div>
+                    <div class="alert alert-success mt-auto mb-0">تمت الموافقة ✅</div>
                     {% elif sub.is_approved == False %}
-                    <div class="alert alert-danger mt-auto">تم الرفض ❌</div>
+                    <div class="alert alert-danger mt-auto mb-0">تم الرفض ❌</div>
                     {% else %}
                     <form action="{% url 'approve_submission' sub.id %}" method="POST">
                         {% csrf_token %}
@@ -46,7 +46,6 @@
                     {% endif %}
                 </div>
             </div>
-
             {% endfor %}
         </div>
         {% else %}
@@ -55,13 +54,13 @@
         <div class="text-center mt-4">
             <a href="{% url 'manage_family' family.id %}" class="btn btn-outline-orange"> العودة لإدارة العائلة</a>
         </div>
-
     </main>
 
     <footer class="text-center text-muted py-3 mt-5">
         <a href="{% url 'about' %}">من نحن</a> | جميع الحقوق محفوظة © 2025
     </footer>
 
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>
 
 </html>
