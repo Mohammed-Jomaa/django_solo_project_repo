@@ -75,7 +75,7 @@
       {% endif %}
 
       <div class="row g-4 justify-content-center text-center mb-4">
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
           <a href="{% url 'task_list' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
             <img src="{% static 'images/tasks.png' %}" class="card-img-top" alt="قائمة المهام">
             <div class="card-body">
@@ -84,7 +84,7 @@
           </a>
         </div>
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
           <a href="{% url 'review_tasks' family.id %}"
             class="card shadow-sm h-100 text-decoration-none text-dark d-block">
             <img src="{% static 'images/tttt.png' %}" class="card-img-top" alt="مهام قيد المراجعة">
@@ -94,7 +94,7 @@
           </a>
         </div>
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
           <a href="{% url 'children' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
             <img src="{% static 'images/family.png' %}" class="card-img-top" alt="الأطفال">
             <div class="card-body">
@@ -103,7 +103,7 @@
           </a>
         </div>
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
           <a href="{% url 'rewards' family.id %}" class="card shadow-sm h-100 text-decoration-none text-dark d-block">
             <img src="{% static 'images/climped.png' %}" class="card-img-top" alt="الجوائز والنقاط">
             <div class="card-body">
@@ -112,6 +112,7 @@
           </a>
         </div>
       </div>
+
       <div class="d-flex justify-content-end mb-4">
         <a href="{% url 'dashboard' %}" class="btn btn-orange">عودة إلى لوحة التحكم</a>
       </div>
