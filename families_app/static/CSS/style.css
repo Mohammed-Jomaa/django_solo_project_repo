@@ -110,8 +110,20 @@ body {
 
   .card {
     width: 95% !important;
-    margin: 0 auto;
+    margin: auto;
   }
 
+  .card-img-top {
+    height: 120px !important;
+    object-fit: contain;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+
+  .card-body {
+    padding: 0.5rem;
+  }
 
 }
