@@ -54,7 +54,7 @@
             {% if tasks %}
             <div class="row g-4">
                 {% for task in tasks %}
-                <div class="col-md-4">
+                <div class="col-6 col-sm-4 col-md-4">
                     <div class="card shadow-sm p-3 h-100">
                         <h6 class="fw-bold">{{ task.title }}</h6>
                         <p class="mb-2"> النقاط: <strong>{{ task.points }}</strong></p>
@@ -76,7 +76,7 @@
             <div class="row g-4">
                 {% if rewards %}
                 {% for reward in rewards %}
-                <div class="col-md-4">
+                <div class="col-6 col-sm-4 col-md-4">
                     <div class="card shadow-sm text-center h-100 p-3">
                         {% if reward.image %}
                         <img src="{{ reward.image.url }}" class="card-img-top"
