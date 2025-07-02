@@ -109,21 +109,20 @@ body {
   }
 
   .card {
-    width: 95% !important;
-    margin: auto;
-  }
+  width: 95% !important;
+  margin: auto;
+}
 
-  .card-img-top {
-    height: 120px !important;
-    object-fit: contain;
-  }
+.card-img-top {
+  height: 220px !important;
+  object-fit: fill;
+}
 
-  .card-title {
-    font-size: 0.95rem !important;
-  }
+.card-title {
+  font-size: 0.95rem !important;
+}
 
-  .card-body {
-    padding: 0.5rem !important;
-  }
-
+.card-body {
+  padding: 0.5rem;
+}
 }
