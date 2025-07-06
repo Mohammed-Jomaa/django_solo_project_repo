@@ -2,6 +2,7 @@
 
 MissionFamily is an interactive and educational platform designed to help children learn responsibility at home through task assignment, point collection, and rewards — all built with Django.
 
+🔗 **Live Demo**: [http://16.171.206.30/](http://16.171.206.30/)
 ---
 
 ## 📌 Table of Contents

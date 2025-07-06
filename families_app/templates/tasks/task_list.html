@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>قائمة المهام</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
     <link href="{% static 'CSS/style.css' %}" rel="stylesheet" />
 </head>
@@ -43,12 +43,11 @@
                         <form id="delete-task-form-{{ task.id }}" action="{% url 'delete_task' task.id %}" method="post"
                             style="display: none;">
                             {% csrf_token %}
+                            <button type="button" class="btn btn-danger mb-2"
+                                onclick="confirmDeleteTask({{ task.id }})">🗑️
+                                حذف المهمة</button>
+
                         </form>
-
-                        <button type="button" class="btn btn-danger mb-2" onclick="confirmDeleteTask({{ task.id }})">🗑️
-                            حذف المهمة</button>
-
-
 
                     </div>
                 </div>
@@ -70,27 +69,27 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script>
-  function confirmDeleteTask(taskId) {
-    Swal.fire({
-      title: '🗑️ هل أنت متأكد؟',
-      text: "سيتم حذف المهمة نهائيًا!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'نعم، احذفها',
-      cancelButtonText: 'إلغاء',
-      reverseButtons: true,
-      customClass: {
-        confirmButton: 'btn btn-danger mx-2',
-        cancelButton: 'btn btn-outline-secondary'
-      },
-      buttonsStyling: false
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById(`delete-task-form-${taskId}`).submit();
-      }
-    });
-  }
-</script>
+        function confirmDeleteTask(taskId) {
+            Swal.fire({
+                title: '🗑️ هل أنت متأكد؟',
+                text: "سيتم حذف المهمة نهائيًا!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، احذفها',
+                cancelButtonText: 'إلغاء',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'btn btn-danger mx-2',
+                    cancelButton: 'btn btn-outline-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-task-form-${taskId}`).submit();
+                }
+            });
+        }
+    </script>
 
 </body>
 
